@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Генератор НПЦ</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f5f5f5;
+      }
+      #new-character-button {
+        background-color: #007bff; /* Синий цвет для кнопки */
+        color: #fff; /* Белый цвет текста */
+        padding: 15px; /* Увеличим вертикальный отступ */
+        margin: 1em;
+        border: none;
+        border-radius: 25px;
+        font-size: 0.6em; /* Увеличим размер шрифта */
+        cursor: pointer;
+      }
+
+      #new-character-button:hover {
+        background-color: #0056b3; /* Темнее синий при наведении */
+      }
+      #npc-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+        text-align: left;
+        line-height: 1.5em;
+      }
+      #npc-container h1 {
+        text-align: center;
+      }
+      .highlight {
+        background-color: #d3f3ff; /* Светло-синий цвет для подсветки */
+        padding: 2px 4px;
+        border-radius: 4px;
+      }
+      .highlight:hover {
+        background-color: #7ad5f9; /* Светло-синий цвет для подсветки */
+        padding: 2px 4px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="npc-container">
+      <h1>
+        Генератор НПЦ <br /><button
+          id="new-character-button"
+          onclick="generateNPC()"
+        >
+          Новый персонаж
+        </button>
+      </h1>
+      <div id="npc-output"></div>
+    </div>
+
+    <script>
+      const characteristics = {
+        physique: [
+          "атлетического",
+          "крепкого",
+          "тучного",
+          "худощавого",
+          "высокого",
+          "карликового",
+          "стройного",
+          "плотного",
+          "низкого",
+          "широкого",
+          "мускулистого",
+          "дряблого",
+          "хромого",
+          "неповротливого",
+          "тощего",
+          "среднего",
+          "громадного",
+          "привлекательного",
+          "гибкого",
+          "жилистого",
+        ],
+        face: [
+          "потное",
+          "усталое",
+          "острое",
+          "округлое",
+          "длинное",
+          "широкое",
+          "узкое",
+          "милое",
+          "изрезаное шрамом",
+          "грустное",
+          "хмурое",
+          "открытое",
+          "канопатое",
+          "покрытое макияжем",
+        ],
+        skin: [
+          "темная",
+          "светлая",
+          "бледная",
+          "маслянистая",
+          "сухая",
+          "медового цвета",
+          "загорелая",
+          "с родинками",
+          "очень гладкая",
+          "шелковистая",
+          "оливковая",
+          "морщинистая",
+          "прыщавая",
+          "татуированная",
+          "рубцованая",
+          "покрасневшая",
+          "с макияжем",
+          "безупречная",
+          "серая",
+        ],
+        hair: [
+          "Отсутствующие",
+          "Заплетенные в косы",
+          "Кучерявые",
+          "Подстриженные",
+          "Курчавый",
+          "Распущенные",
+          "Скрученные",
+          "Собранные в хвост",
+          "Окрашенные",
+          "Блестящие",
+          "Маслянистые",
+          "Грязные",
+          "Средней длины",
+          "Длинные",
+          "Шелковистые",
+          "Густые",
+          "Вьющиеся",
+          "По плечи",
+          "Мокрые",
+          "Средней длины",
+        ],
+        clothing: [
+          "немногочисленную",
+          "окровавленную",
+          "церемониальную",
+          "разноцветную",
+          "эксцентричную",
+          "элегантную",
+          "модную",
+          "грязную",
+          "кричащую",
+          "изношенную",
+          "иностранную",
+          "украшенную драгоценностями",
+          "бесформенную",
+          "удобная",
+          "прогнившую",
+          "поношенную",
+          "дырявую",
+          "порезанную",
+          "пропитанную ароматом",
+          "запятнанную",
+        ],
+        speech: [
+          "Тупая",
+          "Громкая",
+          "Душещипательная",
+          "Крикливая",
+          "Формальная",
+          "Криптичная",
+          "Веселая",
+          "Строгая",
+          "Навязчивая",
+          "Свирепая",
+          "Замедленная",
+          "Шепотом",
+          "Мелодичная",
+          "Требовательная",
+          "Разговорчивая",
+          "Раскатистая",
+          "Пошлая",
+          "Загадочная",
+          "Зловещая",
+          "Спокойная",
+        ],
+        background: [
+          "Алхимик",
+          "Нищий",
+          "Мясник",
+          "Вор",
+          "Шарлатан",
+          "Священник",
+          "Повар",
+          "Поклонник культа",
+          "Гемблер",
+          "Травник",
+          "Маг",
+          "Моряк",
+          "Наёмник",
+          "Торговец",
+          "Вне закона",
+          "Исполнитель",
+          "Пират",
+          "Герой",
+          "Студент",
+          "Вышибала",
+        ],
+        misfortunes: [
+          "Брошен",
+          "Зависим от веществ",
+          "Вымогательство",
+          "Обвинён в преступлении",
+          "Проклят",
+          "Обманут",
+          "Понижен в звании",
+          "Одержим",
+          "Брошен родителями",
+          "Экзилирован",
+          "Осуждён",
+          "Беден",
+          "Преследуем",
+          "Отвергнут",
+          "Заменён двойником",
+          "Обокраден",
+          "Подвергнут пыткам",
+          "Бежал из заключения",
+          "Разорён",
+          "Поддерживает зависимость",
+        ],
+        virtue: [
+          "Амбициозен",
+          "Осторожен",
+          "Смел",
+          "Вежлив",
+          "Любопытен",
+          "Дисциплинирован",
+          "Сосредоточен",
+          "Щедр",
+          "Общительн",
+          "Честен",
+          "Честолюбив",
+          "Смирен",
+          "Идеалистичен",
+          "Справедлив",
+          "Лоялен",
+          "Милосерден",
+          "Праведен",
+          "Спокоен",
+          "Стойк",
+          "Терпим",
+        ],
+        vice: [
+          "Агрессивен",
+          "Высокомерен",
+          "Завистлив",
+          "Труслив",
+          "Жесток",
+          "Обманчив",
+          "Легкомыслен",
+          "Обжорлив",
+          "Алчен",
+          "Вспыльчив",
+          "Ленив",
+          "Нервозен",
+          "Предвзят",
+          "Безрассуден",
+          "Груб",
+          "Подозрителен",
+          "Тщеславен",
+          "Мстителен",
+          "Расточителен",
+          "Нытик",
+        ],
+        alignment: ["Законопослушное", "Нейтральное", "Хаотическое"],
+        races: [
+          "человека",
+          "эльфа",
+          "дварфа",
+          "гнома",
+          "полурослика",
+          "женщину",
+          "полуорка",
+          "полуэльфа",
+          "тифлинга",
+          "голиафа",
+          "фирболга",
+        ],
+      };
+
+      function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function generateNPC() {
+        const physiqueIndex = getRandomInt(
+          0,
+          characteristics.physique.length - 1
+        );
+        const faceIndex = getRandomInt(0, characteristics.face.length - 1);
+        const skinIndex = getRandomInt(0, characteristics.skin.length - 1);
+        const hairIndex = getRandomInt(0, characteristics.hair.length - 1);
+        const clothingIndex = getRandomInt(
+          0,
+          characteristics.clothing.length - 1
+        );
+        const speechIndex = getRandomInt(0, characteristics.speech.length - 1);
+        const backgroundIndex = getRandomInt(
+          0,
+          characteristics.background.length - 1
+        );
+        const misfortunesIndex = getRandomInt(
+          0,
+          characteristics.misfortunes.length - 1
+        );
+        const virtueIndex = getRandomInt(0, characteristics.virtue.length - 1);
+        const viceIndex = getRandomInt(0, characteristics.vice.length - 1);
+        const raceIndex = getRandomInt(0, characteristics.races.length - 1);
+
+        document.getElementById("npc-output").innerHTML = `
+        <p>Вы видите <span class="highlight" onclick="replaceCharacteristic(this, 'races', ${raceIndex})">${
+          characteristics.races[raceIndex]
+        }</span> <span class="highlight" onclick="replaceCharacteristic(this, 'physique', ${physiqueIndex})">${
+          characteristics.physique[physiqueIndex]
+        }</span> телосложения. У него <span class="highlight" onclick="replaceCharacteristic(this, 'face', ${faceIndex})">${
+          characteristics.face[faceIndex]
+        }</span> лицо и <span class="highlight" onclick="replaceCharacteristic(this, 'skin', ${skinIndex})">${
+          characteristics.skin[skinIndex]
+        }</span> кожа. <span class="highlight" onclick="replaceCharacteristic(this, 'hair', ${hairIndex})">${
+          characteristics.hair[hairIndex]
+        }</span> волосы.  Он одет в <span class="highlight" onclick="replaceCharacteristic(this, 'clothing', ${clothingIndex})">${
+          characteristics.clothing[clothingIndex]
+        }</span> одежду, по которой видно, что он <span class="highlight" onclick="replaceCharacteristic(this, 'background', ${backgroundIndex})">${
+          characteristics.background[backgroundIndex]
+        }</span>.</p>
+        <p><b>Речь:</b> <span class="highlight" onclick="replaceCharacteristic(this, 'speech', ${speechIndex})">${
+          characteristics.speech[speechIndex]
+        }</span></p>
+        <p><b>Добродетель:</b> <span class="highlight" onclick="replaceCharacteristic(this, 'virtue', ${virtueIndex})">${
+          characteristics.virtue[virtueIndex]
+        }</span> <b>Порок:</b> <span class="highlight" onclick="replaceCharacteristic(this, 'vice', ${viceIndex})">${
+          characteristics.vice[viceIndex]
+        }</span></p>
+        <p><b>Несчастья:</b> <span class="highlight" onclick="replaceCharacteristic(this, 'misfortunes', ${misfortunesIndex})">${
+          characteristics.misfortunes[misfortunesIndex]
+        }</span> <b>Мировоззрение:</b> <span class="highlight" onclick="replaceCharacteristic(this, 'alignment', ${getRandomInt(
+          0,
+          characteristics.alignment.length - 1
+        )})">${
+          characteristics.alignment[
+            getRandomInt(0, characteristics.alignment.length - 1)
+          ]
+        }</span></p>
+      `;
+      }
+
+      function replaceCharacteristic(element, category, index) {
+        const newCharacteristic =
+          characteristics[category][
+            getRandomInt(0, characteristics[category].length - 1)
+          ];
+        element.innerHTML = newCharacteristic;
+      }
+
+      generateNPC(); // Генерация первого НПЦ при загрузке страницы
+    </script>
+  </body>
+</html>
